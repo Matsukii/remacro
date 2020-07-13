@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://remacro.herokuapp.com">
+<head>
+    <title>remacro : Remote macros trough internet!</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#181818">
+    <meta name="google" content="notranslate">
+
+    <meta property="og:type" content="website">
+    <meta property="og:name" content="Remote Macros"/>
+    <meta property="og:site_name" content="remacro">
+    <meta property="og:title" content="Remote macros - Home"/>
+    <meta property="og:description" content="Send keyboard and mouse inputs to you PC trough socket.io on internet or your local network"/>
+    <meta property="og:url" content="https://remacro.herokuapp.com"/>
+    <!-- <meta property="og:image" content=""/> -->
+
+
+    <link rel="stylesheet" href="/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+
+
+</head>
+<body class="light">
+    <div id="app">
+        <div id="titlebar-app">
+            <b><a :href="host">rMacros</a></b>
+            <div class="github-icon" >
+                <a href="https://github.com/Matsukii/remoteMacro" target="blank">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.5 0C5.59735 0 0 5.59637 0 12.5C0 18.023 3.58164 22.7085 8.54833 24.3614C9.17301 24.4771 9.40241 24.0902 9.40241 23.76C9.40241 23.462 9.39075 22.4772 9.38545 21.4328C5.90783 22.1889 5.17403 19.9579 5.17403 19.9579C4.60543 18.5131 3.78614 18.129 3.78614 18.129C2.65206 17.3531 3.87163 17.369 3.87163 17.369C5.12688 17.4572 5.78783 18.6572 5.78783 18.6572C6.9027 20.5682 8.71205 20.0157 9.42535 19.6964C9.53751 18.8884 9.86151 18.337 10.219 18.0249C7.44258 17.7087 4.52386 16.6369 4.52386 11.8472C4.52386 10.4826 5.01218 9.36741 5.81185 8.49205C5.68205 8.17716 5.25423 6.90583 5.93293 5.18403C5.93293 5.18403 6.9826 4.84806 9.37134 6.46536C10.3684 6.18831 11.4377 6.04949 12.5 6.04479C13.5624 6.04949 14.6325 6.18831 15.6315 6.46536C18.0174 4.84806 19.0656 5.18403 19.0656 5.18403C19.746 6.90583 19.3179 8.17716 19.1881 8.49205C19.9896 9.36741 20.4746 10.4825 20.4746 11.8472C20.4746 16.6482 17.5504 17.7055 14.7669 18.0149C15.2152 18.4028 15.6147 19.1635 15.6147 20.3297C15.6147 22.0022 15.6002 23.3483 15.6002 23.76C15.6002 24.0927 15.8252 24.4825 16.4589 24.3597C21.4229 22.705 25 18.0211 25 12.5C25 5.59637 19.4034 0 12.5 0Z" fill="#161614"/>
+                    </svg>
+                </a>
+                
+            </div>
+            <button @click="shows.idContainer = !shows.idContainer">Change Remote ID</button>
+            <button @click="theme">{{dark ? 'Dark theme':'Light theme'}}</button>
+        </div>
+
+        <div id="id-container" v-show="shows.idContainer || toid.length == 0">
+            <div id="id-request">
+                <div id="titlebar-setID">
+                    <b>Client ID</b>
+                    <svg width="120" @click="toggleSetId" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 10L60 60L110 110M110 10L10 110" stroke="black" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                        
+                    <!-- <img v-if="toid" src="/close.svg" alt="close popup button" > -->
+                </div>
+                <input 
+                    id="toid"
+                    type="text"
+                    placeholder="REMOTE ID"
+                    v-model="toid"
+                    v-on:keypress="isEnter"
+                >
+                <button class="start-btn" @click="getButtons">Start</button>
+            </div>
+        </div>
+
+        <div id="b-cont">
+            <h4 title="click to hide this title" @click="shows.buttonsTitle = false" v-show="shows.buttonsTitle">Macro buttons</h4>
+            <div class="btns-container">
+                <h4 v-if="shows.noBtns">If there is any button maybe the code is invalid</h4>
+                <button class="mButton" v-for="bt in buttons" @click="sendClick(bt)">{{bt}}</button>
+            </div>
+        </div>
+    </div>
+   
+    <script>
+        const log = (c) => console.log(c)
+
+        socket = io();
+
+        let app = new Vue({
+            el:'#app',
+            data:{
+                toid:'',
+                buttons:[],
+                sid: '',
+                host: `${window.location.protocol}//${window.location.host}`,
+                dark: false,
+                shows:{
+                    idContainer: false,
+                    buttonsTitle: true,
+                    noBtns: true
+                }
+            },
+       
+            watch: {
+                toid(val){
+                    if(!val){
+                        this.shows.idContainer = true
+                    }
+                    this.shows.noBtns = this.buttons.length == 0
+                },
+                buttons(val){
+                    this.shows.noBtns = this.buttons.length == 0
+                }
+            },
+            methods: {
+                isEnter:function(e){
+                    e = e || window.event;
+                    if(e.keyCode == 13){
+                        this.getButtons()
+                    }
+                },
+                toggleSetId: function(){
+                    if(this.toid && this.buttons.length > 0){
+                        this.shows.idContainer = !this.shows.idContainer
+                    }
+                },
+                theme: function(){
+                    if(('' + localStorage.dark) == "true"){
+                        document.body.classList.replace('dark', 'light')
+                        localStorage.dark = false
+                        this.dark = false
+                    }
+                    else{
+                        document.body.classList.replace('light', 'dark')
+                        localStorage.dark = true
+                        this.dark = true
+                    }
+                },
+                getButtons: function(){
+                    if(!this.toid) return
+                    if(this.shows.idContainer) this.shows.idContainer = false
+                    socket.emit("getBtns", {toid: this.toid})
+                    history.pushState(null,`Controlling - ${this.toid}`, `/${this.toid}`)
+                },
+                sendClick: function(button){
+                    setTimeout(() => {
+                        socket.emit("macro", {toid: this.toid, key: button})
+                    }, 50)
+                }
+            },
+            created() {
+                if(('' + localStorage.dark) == "true"){
+                    document.body.classList.replace('light', 'dark')
+                    this.dark = true
+                }
+                else{
+                    document.body.classList.replace('dark', 'light')
+                    this.dark = false
+                }
+
+                if(window.location.pathname.substr(1) != ""){
+                    this.toid = window.location.pathname.substr(1);
+                    this.shows.idContainer = false
+                    setTimeout(() => {
+                        this.getButtons()
+                    }, 200)
+                }
+                else{
+                    this.shows.idContainer = true
+                }
+
+                socket.on('connect', () => { console.log("connected") })
+
+                socket.on('resBtns', btns => this.buttons = btns.btns);
+                socket.on('sid', sid => this.sid = sid)
+            },
+        })
+
+    </script>
+</body>
+</html>

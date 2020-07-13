@@ -1,0 +1,20 @@
+{
+  "name": "rio",
+  "version": "1.0.0",
+  "description": "socket io server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "remote-macro",
+    "macro",
+    "macro-over-socket.io"
+  ],
+  "author": "Matsukii",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  }
+}
