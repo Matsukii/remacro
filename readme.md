@@ -1,10 +1,27 @@
 # remacro
 
-[Remote control](https://remacro.herokuapp.com)
+
+[Online Remote control page](https://remacro.herokuapp.com)
 
 Send keyboard and mouse input trough socket.io to a python client from internet or on your local network
 
 you can use either locally, by cloning and install node dependencies or trough the the web on rs-macro.herokuapp.com.
+
+
+## Why?
+
+Sometimes you need to send a combination of keys, but can't reach the keyboard and have you phone next, or maybe need to send keystrokes to control a devicxe without the keyboard, well, there it is
+
+This is part of the [sMacros](https://github.com/Matsukii/sMacros), the idea came from it with socket.io integration to control other things trhoug arduino and what actually made start was when a friend was streaming and need to change scenes while is playing
+
+
+### About security
+
+_"So, can you install python and run this (not-suspicious) script and let me control the key combinations you set from internet?"_ - Ehhh..., no?
+
+Using localy should be fine, using the socket server online may have security issues, however, the host uses https, the generated id on client **is not** saved to any database/file (code availabe at ['rio' branch](https://github.com/Matsukii/remacro/tree/rio)) and when the client reconnect the code changes
+
+
 
 ## Usage
 
