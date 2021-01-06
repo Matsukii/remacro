@@ -39,7 +39,11 @@
                 
             </div>
             <button @click="shows.idContainer = !shows.idContainer">Change Remote ID</button>
-            <button @click="theme">{{dark ? 'Dark theme':'Light theme'}}</button>
+            <button @click="theme">{{dark ? 'Light theme':'Dark theme'}}</button>
+            <select name="profile" id="profile-select" v-model="activeProfile" class="inpt" @change="loadKeys">
+                <option value="none" disabled>Select profile</option>
+                <option v-for="(prof, i) in profileNames" :value="prof">{{prof}}</option>
+            </select>
         </div>
 
         <div id="id-container" v-show="shows.idContainer || toid.length == 0">
@@ -66,8 +70,8 @@
         <div id="b-cont">
             <h4 title="click to hide this title" @click="shows.buttonsTitle = false" v-show="shows.buttonsTitle">Macro buttons</h4>
             <div class="btns-container">
-                <h4 v-if="shows.noBtns">If there is any button maybe the code is invalid</h4>
-                <button class="mButton" v-for="bt in buttons" @click="sendClick(bt)">{{bt}}</button>
+                <h4 v-if="buttons.length == 0">Your keys should be here, it there is none, check the profiles or open an issue on github</h4>
+                <button class="mButton" v-for="bt in buttons" @click="sendClick(bt)">{{current[bt].name}}</button>
             </div>
         </div>
     </div>
@@ -76,13 +80,17 @@
         const log = (c) => console.log(c)
 
         socket = io();
-
+        keys = ""
         let app = new Vue({
             el:'#app',
             data:{
                 toid:'',
+                profileNames:[],
+                profiles:{},
+                current:{},
                 buttons:[],
                 sid: '',
+                activeProfile:"DEFAULT",
                 host: `${window.location.protocol}//${window.location.host}`,
                 dark: false,
                 shows:{
@@ -135,8 +143,27 @@
                 },
                 sendClick: function(button){
                     setTimeout(() => {
-                        socket.emit("macro", {toid: this.toid, key: button})
+                        socket.emit("macro", {toid: this.toid, button: button})
                     }, 50)
+                },
+
+
+
+                /**
+                 * I know, its bad
+                 * i just wanted to do this quickly to make it work... 
+                 */
+                loadKeys(){
+                    this.current = this.profiles[this.activeProfile]
+                    let keys = Object.keys(this.current)
+                    keys.splice(keys.lastIndexOf('desc'), 1)
+                    keys.splice(keys.lastIndexOf('name'), 1)
+                    keys.splice(keys.lastIndexOf('windowName'), 1)
+                    keys.splice(keys.lastIndexOf('enable'), 1)
+
+                    console.log(keys);
+                    
+                    this.buttons = keys
                 }
             },
             created() {
@@ -162,9 +189,28 @@
 
                 socket.on('connect', () => { console.log("connected") })
 
-                socket.on('resBtns', btns => this.buttons = btns.btns);
+
+                /**
+                 * I know, its bad all of these replaces that can fail on
+                 * i just wanted to do this quickly to make it work without changing too much of the code on client
+                 */
+                socket.on('resBtns', btns => {
+                    this.profiles = (btns.profiles.replaceAll(`'`, `"`))
+                    this.profiles = this.profiles.replaceAll(/<Key.[a-z0-9]{0,}: <[0-9]{0,}>>/gi, `"modifier_key"`)
+                    this.profiles = this.profiles.replaceAll(/False/gi, false)
+                    this.profiles = this.profiles.replaceAll(/True/gi, true)
+                    this.profiles = JSON.parse(this.profiles)
+
+
+                    this.profileNames = Object.keys(this.profiles)
+                    this.loadKeys()
+                });
+
                 socket.on('sid', sid => this.sid = sid)
             },
+            computed:{
+                
+            }
         })
 
     </script>
