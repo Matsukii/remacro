@@ -28,7 +28,7 @@ options = {
     # * ex: --host http://localhost:3001
     # * the default url is "https://remacro.herokuapp.com"
     # "socketURL": 'https://remacro.herokuapp.com',
-    "socketURL": 'http://localhost:3001',
+    "socketURL": 'https://remacro.herokuapp.com',
 
     # enable default actions for any application
     "enabledefault": True,
