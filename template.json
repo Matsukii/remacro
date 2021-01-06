@@ -1,0 +1,80 @@
+{
+    "template": {
+        "name": "",
+        "desc": "",
+        "windowName": "",
+        "enable": True,
+        "A7": {
+            "name": "press key codes with modifiers",
+            "type": "pressKeyCodes",
+            "data": [
+                Key.ctrl,
+                Key.shift,
+                Key.alt,
+                Key.space,
+                "g"
+            ]
+        },
+        "A8": {
+            "name": "press a single key",
+            "type": "pressKey",
+            "data": "l"
+        },
+        "A9": {
+            "name": "press keys without modifier",
+            "type": "pressKeys",
+            "data": [
+                "a",
+                "b"
+            ]
+        },
+        "B0": {
+            "name": "type text",
+            "type": "typeText",
+            "data": "some text"
+        },
+        "B1": {
+            "name": "open url",
+            "type": "openURL",
+            "data": "https://google.com"
+        },
+        "B2": {
+            "name": "move mouse",
+            "type": "mouseMove",
+            "data": [
+                -200,
+                100
+            ]
+        },
+        "B3": {
+            "name": "click multiple buttons",
+            "type": "mouseMultiClicks",
+            "data": [
+                mouseBtn.right,
+                mouseBtn.left
+            ]
+        },
+        "B4": {
+            "name": "run command",
+            "type": "runCommand",
+            "data": "echo hi there"
+        },
+        "B5": {
+            "name": "click",
+            "type": "mouseClick",
+            "data": {
+                "button": mouseBtn.right,
+                "times": 1
+            }
+            
+        },
+        "B7": {
+            "name": "move mouse",
+            "type": "mouseSetPosition",
+            "data": [
+                200,
+                100
+            ]
+        }
+    }
+}

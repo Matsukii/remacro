@@ -1,0 +1,79 @@
+{
+    "template": {
+        "name": "exampled",
+        "desc": "examples of usage (you can remove this and set your own)",
+        "windowName": "",
+        "enable": true,
+        "A7": {
+            "name": "press key codes with modifiers",
+            "type": "pressKeyCodes",
+            "data": [
+                {
+                    "key": "ctrl",
+                    "keyCode": 17,
+                    "isModifier": true
+                },
+                {
+                    "key": "shift",
+                    "keyCode": 16,
+                    "isModifier": true
+                },
+                {
+                    "key": "space",
+                    "keyCode": 32,
+                    "isModifier": true
+                },
+                {
+                    "key": "g",
+                    "keyCode": 71
+                }
+            ]
+        },
+        "A8": {
+            "name": "press a single key",
+            "type": "pressKey",
+            "data": "l"
+        },
+        "A9": {
+            "name": "press keys without modifier",
+            "type": "pressKeys",
+            "data": [
+                "a",
+                "b"
+            ]
+        },
+        "B0": {
+            "name": "type text",
+            "type": "typeText",
+            "data": "some text"
+        },
+        "B1": {
+            "name": "open url",
+            "type": "openURL",
+            "data": "https://google.com"
+        },
+        "B2": {
+            "name": "move mouse",
+            "type": "mouseMove",
+            "data": [
+                -200,
+                100
+            ]
+        },
+       
+        "B4": {
+            "name": "run command",
+            "type": "runCommand",
+            "data": "echo hi there"
+        },
+        
+        "B7": {
+            "name": "move mouse",
+            "type": "mouseSetPosition",
+            "data": [
+                200,
+                100
+            ]
+        }
+    }
+}
